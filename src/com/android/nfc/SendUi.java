@@ -334,7 +334,6 @@ public class SendUi implements Animator.AnimatorListener, View.OnTouchListener,
 
         mTextHint.setText(mContext.getResources().getString(R.string.touch));
         mTextHint.setAlpha(0.0f);
-        mTextHint.setText(R.string.touch);
         mTextHint.setVisibility(View.VISIBLE);
         mHintAnimator.start();
 

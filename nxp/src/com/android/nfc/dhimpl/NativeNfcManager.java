@@ -38,8 +38,6 @@ public class NativeNfcManager implements DeviceHost {
 
     private static final String NFC_CONTROLLER_FIRMWARE_FILE_NAME = "/vendor/firmware/libpn544_fw.so";
 
-    private static final String NFC_CONTROLLER_FIRMWARE_FILE_NAME_2 = "/system/lib/libpn544_fw.so";
-
     static final String PREF = "NxpDeviceHost";
 
     private static final String PREF_FIRMWARE_MODTIME = "firmware_modtime";
@@ -103,9 +101,6 @@ public class NativeNfcManager implements DeviceHost {
         int nbRetry = 0;
         try {
             firmwareFile = new File(NFC_CONTROLLER_FIRMWARE_FILE_NAME);
-            if (!firmwareFile.exists()) {
-                firmwareFile = new File(NFC_CONTROLLER_FIRMWARE_FILE_NAME_2);
-            }
         } catch(NullPointerException npe) {
             Log.e(TAG,"path to firmware file was null");
             return;
@@ -173,23 +168,40 @@ public class NativeNfcManager implements DeviceHost {
     }
 
     @Override
+    public boolean sendRawFrame(byte[] data)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean routeAid(byte[] aid, int route)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean unrouteAid(byte[] aid)
+    {
+       return false;
+    }
+
+    @Override
     public native void enableDiscovery();
 
     @Override
     public native void disableDiscovery();
 
     @Override
-    public native void enableCE_A();
+    public void enableRoutingToHost()
+    {
+
+    }
 
     @Override
-    public native void disableCE_A();
+    public void disableRoutingToHost()
+    {
 
-    @Override
-    public native void enableCE_B();
-
-    @Override
-    public native void disableCE_B();
-
+    }
 
     @Override
     public native int[] doGetSecureElementList();
@@ -320,8 +332,6 @@ public class NativeNfcManager implements DeviceHost {
                 return 0; // PN544 does not support transceive of raw NfcB
             case (TagTechnology.NFC_V):
                 return 253; // PN544 RF buffer = 255 bytes, subtract two for CRC
-            case (TagTechnology.ISO_PCD_A):
-            case (TagTechnology.ISO_PCD_B):
             case (TagTechnology.ISO_DEP):
                 /* The maximum length of a normal IsoDep frame consists of:
                  * CLA, INS, P1, P2, LC, LE + 255 payload bytes = 261 bytes
@@ -347,6 +357,18 @@ public class NativeNfcManager implements DeviceHost {
     @Override
     public void setP2pTargetModes(int modes) {
         doSetP2pTargetModes(modes);
+    }
+
+    private native void doEnableReaderMode(int technologies);
+    public boolean enableReaderMode(int technologies) {
+        doEnableReaderMode(technologies);
+        return true;
+    }
+
+    private native void doDisableReaderMode();
+    public boolean disableReaderMode() {
+        doDisableReaderMode();
+        return true;
     }
 
     @Override
